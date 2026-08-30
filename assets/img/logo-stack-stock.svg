@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="520" height="150" viewBox="0 0 520 150">
+<rect width="520" height="150" rx="24" fill="#0B2239"/>
+<g transform="translate(25 26)">
+<path d="M18 15h14l10 55h72l12-40H44" fill="none" stroke="#F58220" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="56" cy="87" r="9" fill="#fff"/><circle cx="108" cy="87" r="9" fill="#fff"/>
+<rect x="57" y="14" width="21" height="21" rx="4" fill="#2D9CDB"/><rect x="80" y="4" width="22" height="22" rx="4" fill="#F58220"/><rect x="82" y="28" width="24" height="23" rx="4" fill="#F2C94C"/>
+</g>
+<text x="165" y="72" font-family="Arial,Helvetica,sans-serif" font-weight="700" font-size="44" fill="#fff">Stack &amp; <tspan fill="#F58220">Stock</tspan></text>
+<text x="168" y="108" font-family="Arial,Helvetica,sans-serif" font-size="20" letter-spacing="9" fill="#BFD3E6">MARKET</text>
+</svg>
