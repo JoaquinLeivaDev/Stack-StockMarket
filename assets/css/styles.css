@@ -225,7 +225,7 @@ footer {
     background: #fff;
     border-radius: 16px;
     padding: 16px;
-    height: 100%
+    height: auto
 }
 
 .sale-number {
@@ -286,6 +286,17 @@ footer {
     overflow: hidden;
     border: 1px solid var(--line);
     box-shadow: 0 15px 35px rgba(11, 34, 57, .1)
+}
+
+.mapita {
+    height: auto;
+    object-fit: auto;
+    border-radius: 30px;
+    border-top: 10px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 80%;
 }
 
 @media(max-width:767px) {
