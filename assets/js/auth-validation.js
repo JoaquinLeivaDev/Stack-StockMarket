@@ -1,4 +1,5 @@
-// Validación de formularios de autenticación (login y registro).
+// Validación de formularios de autenticación pública (login y registro).
+// Coordina la validación de campos y usa UserStore/localStorage para la sesión del cliente.
 // Usa las utilidades de rut.js (marcarCampo, validarRut, formatearRutInput, COMUNAS).
 // Rescatado y adaptado del Proyecto Almacén, con feedback en vivo por campo.
 
@@ -16,19 +17,31 @@ function inicializarFormularioLogin() {
 
     function validar() {
         let ok = true;
+        // El correo debe respetar el formato definido para las cuentas públicas.
         ok = marcarCampo(email, REGEX_EMAIL.test(email.value.trim()),
             "Ingresa un correo electrónico válido.") && ok;
-        ok = marcarCampo(password, password.value.length >= 8,
-            "Tu contraseña debe tener al menos 8 caracteres.") && ok;
+        // El login mantiene la política de longitud de contraseña de las credenciales existentes.
+        ok = marcarCampo(password, password.value.length >= 4 && password.value.length <= 10,
+            "Tu contraseña debe tener entre 4 y 10 caracteres.") && ok;
         return ok;
     }
 
     [email, password].forEach((campo) => campo.addEventListener("input", validar));
 
-    form.addEventListener("submit", (e) => {
+    form.addEventListener("submit", async (e) => {
         e.preventDefault();
         if (!validar()) return;
-        document.getElementById("loginSuccess").classList.remove("d-none");
+        const user = await UserStore.authenticate(email.value, password.value);
+        const success = document.getElementById("loginSuccess");
+        const message = document.getElementById("loginMessage");
+        // Una cuenta solo continúa si sus credenciales coinciden con UserStore.
+        if (!user) { message.textContent = "Credenciales inválidas."; message.className = "alert alert-danger"; return; }
+        // El login público acepta únicamente usuarios con rol cliente.
+        if (user.role !== "client") { message.textContent = "Esta cuenta debe ingresar desde admin.html."; message.className = "alert alert-warning"; return; }
+        // La sesión pública se separa de la administrativa mediante una clave propia de localStorage.
+        localStorage.setItem("ss_public_session", JSON.stringify({ userId: user.id, name: user.name, role: user.role, createdAt: new Date().toISOString() }));
+        success.classList.remove("d-none");
+        message.className = "alert alert-success d-none";
     });
 
     const togglePwd = document.getElementById("toggleLoginPassword");
@@ -63,24 +76,31 @@ function inicializarFormularioRegistro() {
     function validar() {
         let ok = true;
 
+        // El nombre se limita a letras para evitar registros con formato inválido.
         ok = marcarCampo(nombre, REGEX_SOLO_LETRAS.test(nombre.value.trim()),
             "Ingresa tu nombre completo (solo letras).") && ok;
 
+        // validarRut comprueba dígitos y dígito verificador del RUT chileno.
         ok = marcarCampo(rut, validarRut(rut.value),
             "El RUT ingresado no es válido. Formato esperado: 12.345.678-9.") && ok;
 
+        // El correo registrado debe cumplir el formato establecido por REGEX_EMAIL.
         ok = marcarCampo(email, REGEX_EMAIL.test(email.value.trim()),
             "Ingresa un correo electrónico válido.") && ok;
 
+        // El teléfono debe corresponder al formato chileno esperado por el formulario.
         ok = marcarCampo(telefono, REGEX_TELEFONO.test(telefono.value.trim()),
             "Ingresa un teléfono chileno válido, ej: +56 9 1234 5678.") && ok;
 
+        // Solo se aceptan comunas presentes en el catálogo de sugerencias.
         ok = marcarCampo(comuna, COMUNAS.includes(comuna.value.trim()),
             "Selecciona una comuna válida de la lista de sugerencias.") && ok;
 
+        // El registro exige una contraseña de al menos ocho caracteres.
         ok = marcarCampo(password, password.value.length >= 8,
             "La contraseña debe tener al menos 8 caracteres.") && ok;
 
+        // La confirmación debe coincidir y no puede quedar vacía.
         ok = marcarCampo(password2, password2.value === password.value && password2.value !== "",
             "Las contraseñas no coinciden.") && ok;
 
