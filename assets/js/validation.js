@@ -1,3 +1,13 @@
+// validation.js — Validación en vivo del formulario de contacto.
+// Rol: valida campo a campo (nombre, email, teléfono, asunto y mensaje) con reglas propias,
+// marca los inputs con is-valid/is-invalid (estilos Bootstrap), muestra el mensaje de error
+// junto a cada campo y un aviso de éxito al enviar. No usa localStorage: es validación de
+// interfaz solamente (no hay backend que reciba el formulario).
+// Página que lo carga: contacto.html (después de products.js y app.js).
+
+// Punto de entrada del archivo: al cargar el DOM busca #contactForm y, si existe, define las
+// reglas, engancha los eventos por campo y maneja el envío. Si el formulario no está (otra
+// página), no hace nada.
 document.addEventListener("DOMContentLoaded", () => {
 
     const form = document.getElementById("contactForm");
@@ -7,7 +17,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    // Reglas de validación para cada campo del formulario
+    // Reglas de validación para cada campo del formulario.
+    // Cada regla recibe el valor del campo y devuelve "" si es válido o el mensaje de error
+    // que se mostrará en el .invalid-feedback correspondiente.
     const rules = {
 
         nombre: (value) => {
@@ -46,7 +58,12 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
 
-    // Valida un campo individual del formulario
+    // Valida un campo individual del formulario.
+    // CON QUÉ COMUNICA: consulta la regla según field.name, alterna las clases is-invalid /
+    //                   is-valid del input y escribe el mensaje en el .invalid-feedback que
+    //                   vive en su elemento padre. Devuelve true si el campo es válido.
+    // CUÁNDO SE EJECUTA: En el evento blur de cada campo, mientras se escribe si el campo
+    //                    ya tenía error, y para todos los campos al enviar el formulario.
     const validate = (field) => {
 
         const message =
@@ -82,7 +99,8 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
 
-    // Agrega eventos de validación a cada campo
+    // Agrega eventos de validación a cada campo (una sola vez, durante el DOMContentLoaded):
+    // valida al salir del campo (blur) y vuelve a validar mientras escribe solo si había error.
     Object.keys(rules).forEach((fieldName) => {
 
         const field =
@@ -117,7 +135,12 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 
-    // Evento al enviar el formulario
+    // Evento al enviar el formulario.
+    // QUÉ HACE: valida todos los campos; si todos pasan, muestra el aviso de éxito,
+    //           limpia el formulario y quita los estilos de validación restantes.
+    // CON QUÉ COMUNICA: evento submit de #contactForm con preventDefault (sin envío real);
+    //                   muestra #contactSuccess (quitándole la clase d-none) y llama a form.reset().
+    // CUÁNDO SE EJECUTA: Al hacer clic en el botón de envío del formulario de contacto.
     form.addEventListener(
         "submit",
         (event) => {

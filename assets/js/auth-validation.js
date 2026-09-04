@@ -1,13 +1,26 @@
-// Validación de formularios de autenticación pública (login y registro).
-// Coordina la validación de campos y usa UserStore/localStorage para la sesión del cliente.
+// auth-validation.js — Validación de formularios de autenticación pública (login y registro).
+// Rol: coordina la validación de campos y usa UserStore/localStorage para la sesión del cliente.
 // Usa las utilidades de rut.js (marcarCampo, validarRut, formatearRutInput, COMUNAS).
 // Rescatado y adaptado del Proyecto Almacén, con feedback en vivo por campo.
+// Clave que escribe: "ss_public_session" (sesión del cliente, independiente de la sesión
+// administrativa "ss_admin_session"). Los usuarios se leen vía UserStore (clave "ss_users").
+// Páginas que lo cargan: login.html y registro.html (ambas cargan antes rut.js y user-store.js).
 
+// Punto de entrada: al cargar el DOM inicializa el formulario de login y el de registro;
+// cada inicializador comprueba si su formulario existe en la página y termina temprano si no.
 document.addEventListener("DOMContentLoaded", () => {
     inicializarFormularioLogin();
     inicializarFormularioRegistro();
 });
 
+// QUÉ HACE: Prepara el formulario de login: validación en vivo de email y contraseña,
+//           autenticación contra UserStore (solo acepta rol cliente) y el botón que
+//           muestra/oculta la contraseña.
+// CON QUÉ COMUNICA: DOM: #loginForm, #loginEmail, #loginPassword, #toggleLoginPassword,
+//                   #loginSuccess y #loginMessage. Llama a marcarCampo y REGEX_EMAIL (rut.js)
+//                   y a UserStore.authenticate (lectura de "ss_users"); si las credenciales
+//                   son válidas, escribe la sesión del cliente en "ss_public_session".
+// CUÁNDO SE EJECUTA: En DOMContentLoaded de login.html; no hace nada si no existe #loginForm.
 function inicializarFormularioLogin() {
     const form = document.getElementById("loginForm");
     if (!form) return;
@@ -15,6 +28,8 @@ function inicializarFormularioLogin() {
     const email = form.querySelector("#loginEmail");
     const password = form.querySelector("#loginPassword");
 
+    // Valida el email (formato) y la contraseña (4 a 10 caracteres), marcando cada campo con
+    // marcarCampo (rut.js). Se ejecuta en cada evento input de ambos campos y antes de autenticar.
     function validar() {
         let ok = true;
         // El correo debe respetar el formato definido para las cuentas públicas.
@@ -28,6 +43,11 @@ function inicializarFormularioLogin() {
 
     [email, password].forEach((campo) => campo.addEventListener("input", validar));
 
+    // QUÉ HACE: Al enviar, valida y autentica contra UserStore; rechaza credenciales inválidas
+    //           y cuentas que no sean de rol cliente; si todo pasa, crea la sesión pública.
+    // CON QUÉ COMUNICA: UserStore.authenticate (lee "ss_users"); escribe "ss_public_session";
+    //                   muestra #loginSuccess y publica el resultado en #loginMessage.
+    // CUÁNDO SE EJECUTA: Al enviar #loginForm (evento submit con preventDefault, sin redirección).
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
         if (!validar()) return;
@@ -44,6 +64,8 @@ function inicializarFormularioLogin() {
         message.className = "alert alert-success d-none";
     });
 
+    // Alterna la visibilidad de la contraseña (#loginPassword) y el rótulo del botón
+    // (#toggleLoginPassword: Mostrar/Ocultar). Se ejecuta al hacer clic en ese botón.
     const togglePwd = document.getElementById("toggleLoginPassword");
     if (togglePwd) {
         togglePwd.addEventListener("click", () => {
@@ -54,6 +76,15 @@ function inicializarFormularioLogin() {
     }
 }
 
+// QUÉ HACE: Prepara el formulario de registro: formateo del RUT en vivo, datalist de comunas,
+//           validación de los siete campos con feedback en vivo y aviso de éxito al enviar.
+// CON QUÉ COMUNICA: DOM: #registroForm, #registroNombre, #registroRut, #registroEmail,
+//                   #registroTelefono, #registroComuna, #registroPassword, #registroPassword2,
+//                   #listaComunas (datalist) y #registroSuccess. Usa las utilidades de rut.js:
+//                   formatearRutInput, validarRut, marcarCampo, COMUNAS, REGEX_EMAIL,
+//                   REGEX_SOLO_LETRAS y REGEX_TELEFONO.
+//                   Nota: el registro es solo de interfaz; NO crea el usuario en "ss_users".
+// CUÁNDO SE EJECUTA: En DOMContentLoaded de registro.html; no hace nada si no existe #registroForm.
 function inicializarFormularioRegistro() {
     const form = document.getElementById("registroForm");
     if (!form) return;
@@ -73,6 +104,8 @@ function inicializarFormularioRegistro() {
         datalist.innerHTML = COMUNAS.map((c) => `<option value="${c}">`).join("");
     }
 
+    // Valida los siete campos del registro según las reglas comentadas a continuación;
+    // se ejecuta en cada evento input/change de cualquier campo y antes de aceptar el envío.
     function validar() {
         let ok = true;
 
@@ -112,6 +145,10 @@ function inicializarFormularioRegistro() {
         campo.addEventListener("change", validar);
     });
 
+    // QUÉ HACE: Maneja el envío del registro: si todos los campos pasan la validación, muestra
+    //           el aviso de éxito (#registroSuccess), limpia el formulario y quita los estilos
+    //           de validación. No persiste nada: no escribe en "ss_users" ni otra clave.
+    // CUÁNDO SE EJECUTA: Al enviar #registroForm (evento submit con preventDefault).
     form.addEventListener("submit", (e) => {
         e.preventDefault();
         if (!validar()) return;
