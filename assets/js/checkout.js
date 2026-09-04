@@ -1,3 +1,15 @@
+// checkout.js — Flujo de finalización de compra: validación del despacho, métodos de pago,
+// confirmación de la venta y renderizado de la confirmación.
+// Páginas que lo cargan: checkout.html, pago.html y confirmacion.html.
+// Todas cargan antes products.js y app.js: este archivo usa getCart, cartTotals y fmt de app.js.
+
+// QUÉ HACE: Valida el formulario de despacho (nombre, email, dirección y comuna obligatorios,
+//           más el formato del email) y, si todo es correcto, guarda los datos y avanza al pago.
+// CON QUÉ COMUNICA: Escucha el submit de #checkoutForm; marca los campos inválidos con la clase
+//                   is-invalid (estilos Bootstrap); guarda los datos validados en localStorage
+//                   ("ss_checkout") y redirige a pago.html mediante location.href.
+// CUÁNDO SE EJECUTA: En checkout.html, al enviar el formulario; el listener se registra
+//                    durante DOMContentLoaded.
 function validateCheckout() {
     const form = document.getElementById("checkoutForm");
 
@@ -67,12 +79,17 @@ function validateCheckout() {
 
 // Muestra u oculta los campos de tarjeta según el método de pago elegido
 // (rescatado del Proyecto Almacén: mismo patrón de radio + sección condicional).
+// CON QUÉ COMUNICA: Escucha los radios input[name="metodo"] y alterna la clase d-none de
+//                   #camposTarjeta según el estado de #metodo-tarjeta.
+// CUÁNDO SE EJECUTA: En pago.html, durante DOMContentLoaded; luego reacciona a cada cambio
+//                    de método de pago (evento change de los radios).
 function inicializarCamposTarjeta() {
     const metodos = document.querySelectorAll('input[name="metodo"]');
     const camposTarjeta = document.getElementById("camposTarjeta");
 
     if (!metodos.length || !camposTarjeta) return;
 
+    // Muestra u oculta #camposTarjeta según si el radio "metodo-tarjeta" está seleccionado.
     function actualizarVisibilidad() {
         const tarjetaSeleccionada = document.getElementById("metodo-tarjeta")?.checked;
         camposTarjeta.classList.toggle("d-none", !tarjetaSeleccionada);
@@ -83,6 +100,11 @@ function inicializarCamposTarjeta() {
 }
 
 // Valida los campos de tarjeta solo si el método "Tarjeta de crédito/débito" está seleccionado
+// CON QUÉ COMUNICA: Comprueba #metodo-tarjeta; valida #pagoTarjeta (16 dígitos), #pagoVencimiento
+//                   (formato MM/AA) y #pagoCvv (3 o 4 dígitos) con marcarCampo, utilidad de rut.js
+//                   (pago.html carga rut.js precisamente para esto). Si el pago es por otro método,
+//                   devuelve true sin validar nada.
+// CUÁNDO SE EJECUTA: Llamada por completePayment antes de confirmar la venta (pago.html).
 function validarCamposTarjeta() {
     const tarjetaSeleccionada = document.getElementById("metodo-tarjeta")?.checked;
     if (!tarjetaSeleccionada) return true;
@@ -103,6 +125,14 @@ function validarCamposTarjeta() {
 }
 
 
+// QUÉ HACE: Confirma la venta: arma el objeto de venta (id "SSM-año-timestamp", fecha local,
+//           método, ítems, cliente y totales), lo guarda como última venta, vacía el carrito
+//           y redirige a la página de confirmación.
+// CON QUÉ COMUNICA: Lee el método activo (input[name="metodo"]:checked), el carrito con getCart
+//                   (clave "ss_cart", app.js), el cliente desde "ss_checkout" y los totales con
+//                   cartTotals (app.js); escribe "ss_last_sale" y elimina "ss_cart"; redirige a
+//                   confirmacion.html mediante location.href.
+// CUÁNDO SE EJECUTA: Al hacer clic en "Confirmar pago piloto" en pago.html (onclick del botón).
 function completePayment() {
     const selectedMethod =
         document.querySelector(
@@ -168,6 +198,11 @@ function completePayment() {
 }
 
 
+// QUÉ HACE: Cancela el pago en curso: registra la cancelación y devuelve al usuario al carrito.
+// CON QUÉ COMUNICA: Escribe el flag "ss_payment_cancelled" (valor "1") en localStorage y redirige
+//                   a carrito.html. Nota: ninguna página lee ese flag hoy; queda como registro
+//                   del evento de cancelación.
+// CUÁNDO SE EJECUTA: Al hacer clic en "Cancelar" en pago.html (onclick del botón).
 function cancelPayment() {
     localStorage.setItem(
         "ss_payment_cancelled",
@@ -179,6 +214,12 @@ function cancelPayment() {
 }
 
 
+// QUÉ HACE: Renderiza el detalle de la última venta confirmada (número, fecha, método, total y
+//           desglose por producto) o un aviso de advertencia si no existe venta reciente.
+// CON QUÉ COMUNICA: Lee "ss_last_sale" de localStorage; escribe en #saleNumber, #saleDate,
+//                   #saleMethod, #saleTotal y el desglose en #saleData; usa fmt (app.js) para los
+//                   montos. No hace nada si la página no contiene #saleData.
+// CUÁNDO SE EJECUTA: En confirmacion.html, durante DOMContentLoaded.
 function renderSale() {
     const saleData =
         document.getElementById(
@@ -264,6 +305,8 @@ function renderSale() {
 }
 
 
+// Punto de entrada de checkout.js: según la página, engancha la validación del despacho
+// (checkout.html), los campos de tarjeta (pago.html) y el detalle de la venta (confirmacion.html).
 document.addEventListener(
     "DOMContentLoaded",
     () => {

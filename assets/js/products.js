@@ -1,3 +1,11 @@
+// products.js — Catálogo público de la tienda (dato de solo lectura; no contiene funciones).
+// Rol: define el arreglo global window.PRODUCTS con id, nombre, precio, categoría, emoji y
+// descripción de cada producto. No usa localStorage ni el DOM: solo expone datos que app.js
+// y checkout.js consumen para renderizar el catálogo, los destacados y el carrito.
+// Páginas que lo cargan: todas las públicas (index, catalogo, carrito, checkout, pago,
+// confirmacion, login, registro, contacto y quienes-somos), siempre antes que app.js.
+// Nota: el panel administrativo usa su propio catálogo (seedProducts de admin-data.js,
+// clave "ss_admin_products"), por lo que el CRUD del panel NO modifica este arreglo.
 window.PRODUCTS = [
   {
     "id": 1,
