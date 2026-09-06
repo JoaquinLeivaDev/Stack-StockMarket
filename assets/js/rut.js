@@ -8,7 +8,7 @@
 
 // Expresiones regulares compartidas por los formularios: correo, solo letras (nombres)
 // y teléfono móvil chileno (+56 9 XXXX XXXX).
-const REGEX_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const REGEX_EMAIL = /^[^\s@]+@(duoc\.cl|profesor\.duoc\.cl|gmail\.com)$/i;
 const REGEX_SOLO_LETRAS = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]{2,60}$/;
 const REGEX_TELEFONO = /^(\+?56)?[\s-]?9[\s-]?\d{4}[\s-]?\d{4}$/;
 
