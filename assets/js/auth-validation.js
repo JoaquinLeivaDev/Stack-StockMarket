@@ -130,8 +130,8 @@ function inicializarFormularioRegistro() {
             "Selecciona una comuna válida de la lista de sugerencias.") && ok;
 
         // El registro exige una contraseña de al menos ocho caracteres.
-        ok = marcarCampo(password, password.value.length >= 8,
-            "La contraseña debe tener al menos 8 caracteres.") && ok;
+        ok = marcarCampo(password, password.value.length >= 4,
+            "La contraseña debe tener al menos 4 caracteres.") && ok;
 
         // La confirmación debe coincidir y no puede quedar vacía.
         ok = marcarCampo(password2, password2.value === password.value && password2.value !== "",

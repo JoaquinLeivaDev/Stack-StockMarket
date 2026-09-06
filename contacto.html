@@ -71,13 +71,13 @@
                         <div id="contactSuccess" class="alert alert-success d-none">Mensaje validado correctamente. En
                             una versión con backend, aquí se enviaría al servidor.</div>
                         <div class="mb-3"><label for="nombre" class="form-label">Nombre completo</label><input
-                                id="nombre" name="nombre" autocomplete="name" class="form-control"
+                                id="nombre" maxlength="100" name="nombre" autocomplete="name" class="form-control"
                                 placeholder="Ej: Juan Pérez">
                             <div class="invalid-feedback"></div>
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3"><label for="email" class="form-label">Correo</label><input
-                                    id="email" name="email" autocomplete="email" type="email" class="form-control"
+                                    id="email" maxlength="100" name="email" autocomplete="email" type="email" class="form-control"
                                     placeholder="nombre@correo.cl">
                                 <div class="invalid-feedback"></div>
                             </div>
@@ -98,7 +98,7 @@
                             <div class="invalid-feedback"></div>
                         </div>
                         <div class="mb-3"><label for="mensaje" class="form-label">Mensaje</label><textarea id="mensaje"
-                                name="mensaje" rows="5" class="form-control"
+                                name="mensaje" maxlength="500" rows="5" class="form-control"
                                 placeholder="Escribe tu consulta..."></textarea>
                             <div class="invalid-feedback"></div>
                         </div><button class="btn btn-brand btn-lg" type="submit">Validar y enviar</button>

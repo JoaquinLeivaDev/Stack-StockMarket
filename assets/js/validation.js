@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
         },
 
         email: (value) => {
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const emailRegex = /^[^\s@]+@(duoc\.cl|profesor\.duoc\.cl|gmail\.com)$/i;
 
             return emailRegex.test(value)
                 ? ""
