@@ -66,7 +66,7 @@
 
                         <div class="mb-3">
                             <label for="loginEmail" class="form-label">Correo electrónico</label>
-                            <input type="email" class="form-control" id="loginEmail" name="email"
+                            <input type="email" class="form-control" id="loginEmail" maxlength="100" name="email"
                                 autocomplete="email" placeholder="nombre@correo.com">
                             <div class="invalid-feedback"></div>
                         </div>
@@ -74,7 +74,7 @@
                         <div class="mb-3">
                             <label for="loginPassword" class="form-label">Contraseña</label>
                             <div class="input-group">
-                                <input type="password" class="form-control" id="loginPassword" name="password"
+                                <input type="password" class="form-control" id="loginPassword" maxlength="10" name="password"
                                     autocomplete="current-password" placeholder="Tu contraseña">
                                 <button class="btn btn-outline-secondary" type="button"
                                     id="toggleLoginPassword">Mostrar</button>
